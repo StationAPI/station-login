@@ -7,21 +7,50 @@ import (
 	"gorm.io/gorm"
 )
 
+type GithubResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
+type GithubUser struct {
+	Id string `json:"id"`
+}
+
 func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 	code := r.URL.Query().Get("code")
 
-	client := http.Client{}
+	token, err := getCode(code)
 
-	clientId, err := ReadSecret("./config/gh/id")
+	cookie := http.Cookie{
+		Name:  "station",
+		Value: token,
+	}
+
+	r.AddCookie(&cookie)
 
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func getUser(token string) (GithubUser, error) {
+	return GithubUser{}, nil
+}
+
+func getCode(code string) (string, error) {
+	client := http.Client{}
+
+	clientId, err := ReadSecret("./config/gh/id")
+
+	if err != nil {
+		return "", err
+	}
+
 	clientSecret, err := ReadSecret("./config/gh/secret")
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	url := fmt.Sprintf(
@@ -38,7 +67,7 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 	)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -46,8 +75,16 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 	res, err := client.Do(req)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	var githubResponse GithubResponse
+
+	parseErr := ProcessBody(res.Body, &githubResponse)
+
+	if parseErr != nil {
+		return "", parseErr
+	}
+
+	return githubResponse.AccessToken, nil
 }
