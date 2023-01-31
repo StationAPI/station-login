@@ -2,15 +2,21 @@ package main
 
 import (
 	"log"
-	"os"
+
+	"github.com/stationapi/station-login/db"
+  "github.com/go-chi/chi/v5"
+  "github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
-	dsn := os.Getenv("DSN")
+  db, err := db.Connect() 
 
-	if dsn == "" {
-		log.Fatal("The DSN environment variable was not found.")
+  if err != nil {
+    log.Fatal(err)
+  }
 
-		return
-	}
+  r := chi.NewRouter()
+
+  r.Use(middleware.Logger)
+  r.Use(middleware.RealIP)
 }
