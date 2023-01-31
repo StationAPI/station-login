@@ -2,26 +2,26 @@ package db
 
 import (
 	"errors"
-  "os"
+	"os"
 
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-  "gorm.io/driver/mysql"
 )
 
 func Connect() (gorm.DB, error) {
 	dsn := os.Getenv("DSN")
 
 	if dsn == "" {
-		return gorm.DB{}, errors.New("The DSN environment variable was not found.")
+		return gorm.DB{}, errors.New("the dsn environment variable was not found")
 	}
 
-  db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-    DisableForeignKeyConstraintWhenMigrating: true,
-  })
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 
-  if err != nil {
-    return gorm.DB{}, err
-  }
+	if err != nil {
+		return gorm.DB{}, err
+	}
 
-  return *db, nil
+	return *db, nil
 }

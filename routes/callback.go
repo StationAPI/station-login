@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/stationapi/station-login/db"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +26,7 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 		Value: token,
 	}
 
-	r.AddCookie(&cookie)
+	http.SetCookie(w, &cookie)
 
 	if err != nil {
 		return err
@@ -34,8 +35,45 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 	return nil
 }
 
+func createUser(githubId string, gormDB gorm.DB) {
+	user := db.User{
+		GithubId: githubId,
+	}
+
+	db.CreateUser(user, gormDB)
+}
+
 func getUser(token string) (GithubUser, error) {
-	return GithubUser{}, nil
+	client := http.Client{}
+
+	req, err := http.NewRequest(
+		"GET",
+		"https://api.github.com/user",
+		nil,
+	)
+
+	if err != nil {
+		return GithubUser{}, err
+	}
+
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("token %s", token))
+
+	res, err := client.Do(req)
+
+	if err != nil {
+		return GithubUser{}, err
+	}
+
+	var user GithubUser
+
+	parseErr := ProcessBody(res.Body, &user)
+
+	if parseErr != nil {
+		return GithubUser{}, parseErr
+	}
+
+	return user, nil
 }
 
 func getCode(code string) (string, error) {
