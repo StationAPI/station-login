@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/stationapi/station-login/db"
+	"github.com/stationapi/station-login/session"
 	"gorm.io/gorm"
 )
 
@@ -32,15 +33,34 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 		return err
 	}
 
+	putErr := session.PutSession(token)	
+
+	if putErr != nil {
+		return putErr
+	}
+
+	user, err := getUser(token)
+
+	if err != nil {
+		return err
+	}
+
+	apiKey := createUser(user.Id, db)
+
+	w.WriteHeader(200)
+	w.Write([]byte(apiKey))
+
 	return nil
 }
 
-func createUser(githubId string, gormDB gorm.DB) {
+func createUser(githubId string, gormDB gorm.DB) string {
 	user := db.User{
 		GithubId: githubId,
 	}
 
-	db.CreateUser(user, gormDB)
+	apiKey := db.CreateUser(user, gormDB)
+
+	return apiKey
 }
 
 func getUser(token string) (GithubUser, error) {
