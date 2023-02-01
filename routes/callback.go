@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/stationapi/station-login/db"
 	"github.com/stationapi/station-login/session"
 	"gorm.io/gorm"
@@ -22,9 +23,11 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 
 	token, err := getCode(code)
 
+  sid := uuid.NewString()
+
 	cookie := http.Cookie{
 		Name:  "station",
-		Value: token,
+		Value: sid,
 	}
 
 	http.SetCookie(w, &cookie)
@@ -33,7 +36,7 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 		return err
 	}
 
-	putErr := session.PutSession(token)	
+	putErr := session.PutSession(sid, token)	
 
 	if putErr != nil {
 		return putErr
