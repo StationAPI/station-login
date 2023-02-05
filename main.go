@@ -22,11 +22,11 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.RealIP)
 
-	r.Get("/auth/github", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/login/github", func(w http.ResponseWriter, r *http.Request) {
 		routes.Login(w, r, db)
 	})
 
-	r.Get("/auth/github/callback", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/login/github/callback", func(w http.ResponseWriter, r *http.Request) {
 		routes.Callback(w, r, db)
 	})
 
