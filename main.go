@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -23,11 +24,23 @@ func main() {
 	r.Use(middleware.RealIP)
 
 	r.Get("/login/github", func(w http.ResponseWriter, r *http.Request) {
-		routes.Login(w, r, db)
+		err := routes.Login(w, r, db)
+
+		if err != nil {
+			fmt.Println(err)
+
+			http.Error(w, "There was an error authenticating you. Please try again later.", http.StatusInternalServerError)
+		}
 	})
 
 	r.Get("/login/github/callback", func(w http.ResponseWriter, r *http.Request) {
-		routes.Callback(w, r, db)
+		err := routes.Callback(w, r, db)
+
+		if err != nil {
+			fmt.Println(err)
+
+			http.Error(w, "There was an error authenticating you. Please try again later.", http.StatusInternalServerError)
+		}
 	})
 
 	http.ListenAndServe(":3000", r)

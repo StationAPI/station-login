@@ -15,10 +15,10 @@ type SessionObject struct {
 }
 
 func GetSessionCache() string {
-	ip := os.Getenv("FC_SESSION_CACHE_SERVICE_HOST")
-	port := os.Getenv("FC_SESSION_CACHE_SERVICE_PORT")
+	ip := os.Getenv("STATION_SESSION_CACHE_SERVICE_HOST")
+	port := os.Getenv("STATION_SESSION_CACHE_SERVICE_PORT")
 
-	url := fmt.Sprintf("http://%s:%s", ip, port)
+	url := fmt.Sprintf("http://%s:%s/put", ip, port)
 
 	return url 
 }

@@ -15,7 +15,7 @@ type GithubResponse struct {
 }
 
 type GithubUser struct {
-	Id string `json:"id"`
+	Id int `json:"id"`
 }
 
 func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
@@ -56,12 +56,20 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 	return nil
 }
 
-func createUser(githubId string, gormDB gorm.DB) string {
+func createUser(githubId int, gormDB gorm.DB) string {
 	user := db.User{
 		GithubId: githubId,
 	}
 
+	exists := db.ValidateUser(githubId, gormDB)
+
+	if exists {
+		return "You have been logged in successfully."
+	}
+
 	apiKey := db.CreateUser(user, gormDB)
+
+	fmt.Println(apiKey)
 
 	return apiKey
 }

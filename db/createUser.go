@@ -8,7 +8,7 @@ import (
 )
 
 type User struct {
-	GithubId string
+	GithubId int
 	ApiKey   string
 }
 
