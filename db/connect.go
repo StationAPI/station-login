@@ -2,9 +2,11 @@ package db
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"strings"
 
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +17,11 @@ func Connect() (gorm.DB, error) {
 		return gorm.DB{}, errors.New("the dsn environment variable was not found")
 	}
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	dsn = strings.ReplaceAll(dsn, "\n", "")
+
+	fmt.Println(dsn)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 

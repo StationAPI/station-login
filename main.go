@@ -29,4 +29,6 @@ func main() {
 	r.Get("/auth/github/callback", func(w http.ResponseWriter, r *http.Request) {
 		routes.Callback(w, r, db)
 	})
+
+	http.ListenAndServe(":3000", r)
 }
