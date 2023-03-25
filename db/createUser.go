@@ -11,6 +11,7 @@ import (
 type User struct {
 	GithubId int
 	ApiKey   string
+  Bumps int
 }
 
 func CreateUser(user User, db gorm.DB) string {
@@ -19,6 +20,7 @@ func CreateUser(user User, db gorm.DB) string {
 	hash := sha256.Sum256([]byte(apiKey))
 
 	user.ApiKey =	string(hash[:]) 
+  user.Bumps = 0
 
 	db.Create(user)
 
