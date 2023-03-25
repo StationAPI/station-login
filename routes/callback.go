@@ -36,16 +36,16 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 		return err
 	}
 
-	putErr := session.PutSession(sid, token)	
-
-	if putErr != nil {
-		return putErr
-	}
-
 	user, err := getUser(token)
 
 	if err != nil {
 		return err
+	}
+
+	putErr := session.PutSession(sid, token, user.Id)	
+
+	if putErr != nil {
+		return putErr
 	}
 
 	apiKey := createUser(user.Id, db)
