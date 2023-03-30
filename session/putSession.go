@@ -11,7 +11,7 @@ import (
 
 type SessionObject struct {
 	Id string `json:"cookie"`
-	Session map[string]interface{} `json:"session"`
+	Session map[string]interface{} `json:"session"`	
 }
 
 func GetSessionCache() string {
@@ -23,11 +23,12 @@ func GetSessionCache() string {
 	return url 
 }
 
-func PutSession(sid string, accessToken string) error {
+func PutSession(sid string, accessToken string, githubId int) error {
   session := SessionObject{
     Id: sid, 
     Session: map[string]interface{}{
       "access_token": accessToken,
+			"github_id": githubId,
     },
   }
 
