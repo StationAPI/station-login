@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/google/uuid"
 	"github.com/stationapi/station-login/db"
@@ -23,11 +24,12 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 
 	token, err := getCode(code)
 
-  sid := uuid.NewString()
+	sid := uuid.NewString()
 
 	cookie := http.Cookie{
-		Name:  "station",
-		Value: sid,
+		Name:   "station",
+		Value:  sid,
+		Domain: os.Getenv("COOKIE_DOMAIN"),
 	}
 
 	http.SetCookie(w, &cookie)
@@ -42,7 +44,7 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 		return err
 	}
 
-	putErr := session.PutSession(sid, token, user.Id)	
+	putErr := session.PutSession(sid, token, user.Id)
 
 	if putErr != nil {
 		return putErr
