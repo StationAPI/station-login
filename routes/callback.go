@@ -30,6 +30,7 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 		Name:   "station",
 		Value:  sid,
 		Domain: os.Getenv("COOKIE_DOMAIN"),
+		Path: "/",
 	}
 
 	http.SetCookie(w, &cookie)
@@ -50,10 +51,9 @@ func Callback(w http.ResponseWriter, r *http.Request, db gorm.DB) error {
 		return putErr
 	}
 
-	apiKey := createUser(user.Id, db)
+	createUser(user.Id, db)
 
-	w.WriteHeader(200)
-	w.Write([]byte(apiKey))
+	http.Redirect(w, r, "https://statn.space/dashboard", 302)
 
 	return nil
 }
